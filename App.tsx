@@ -6,8 +6,8 @@ import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 import { VideoView, useVideoPlayer } from "expo-video";
 import { LibVlcPlayerView } from "expo-libvlc-player";
-import { clearPlaybackSeekIfReached, millisecondsToPlaybackSeconds, progressToPlaybackPosition, validPlaybackDuration } from "./src/player";
-import { shouldShowLoginAfterOnboarding } from "./src/session";
+import { clearPlaybackSeekIfReached, millisecondsToPlaybackSeconds, progressToPlaybackPosition, validPlaybackDuration } from "./player";
+import { shouldShowLoginAfterOnboarding } from "./session";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -41,10 +41,10 @@ import {
   playbackSource,
   prepareCredentials,
   validateAccount,
-} from "./src/xtream";
-import { LEGAL_SECTIONS } from "./src/legal";
-import { clampPlaybackPosition } from "./src/player";
-import { parseStoredCredentials, serializeCredentials } from "./src/session";
+} from "./xtream";
+import { LEGAL_SECTIONS } from "./legal";
+import { clampPlaybackPosition } from "./player";
+import { parseStoredCredentials, serializeCredentials } from "./session";
 
 const STORAGE_KEY = "vortex-play-xtream-account";
 const ACCOUNT_CACHE_KEY = "vortex-play-xtream-account-cache";
@@ -69,7 +69,7 @@ const DAILY_SYNC_MS = 24 * 60 * 60 * 1000;
 const PROFILE_KEY = "vortex-play-profile";
 const PROFILE_PIN_KEY = "vortex-play-profile-pin";
 const REMEMBER_LOGIN_KEY = "vortex-play-remember-login";
-const INTRO_VIDEO_SOURCE = require("./assets/vortex-intro.mp4");
+const INTRO_VIDEO_SOURCE = require("./vortex-intro.mp4");
 
 async function safeSecureGet(key: string): Promise<string | null> {
   try { return await SecureStore.getItemAsync(key); } catch { return null; }
@@ -126,7 +126,7 @@ function pressFeedback() {
 function VortexMark({ compact = false }: { compact?: boolean }) {
   return (
     <View style={styles.brandRow}>
-      <Image source={require("./assets/icon.png")} style={compact ? styles.markSmall : styles.mark} />
+      <Image source={require("./icon.png")} style={compact ? styles.markSmall : styles.mark} />
       {!compact && (
         <View>
           <Text style={styles.wordmark}>VÓRTEX PLAY</Text>
@@ -463,7 +463,7 @@ function OnboardingScreen({ onNext }: { onNext: () => void }) {
       <ScrollView contentContainerStyle={styles.onboardingContent} showsVerticalScrollIndicator={false}>
         <View pointerEvents="none" style={styles.onboardingGlow} />
         <View style={styles.onboardingBrand}>
-          <Image source={require("./assets/icon.png")} style={styles.onboardingLogo} />
+          <Image source={require("./icon.png")} style={styles.onboardingLogo} />
           <Text style={styles.onboardingBrandName}>VÓRTEX PLAY</Text>
         </View>
         <View style={styles.onboardingCopy}>
@@ -962,7 +962,7 @@ function AppScreen() {
               </Pressable>
             ) : null}
             <View style={styles.headerBrand}>
-              <Image source={require("./assets/icon.png")} style={styles.headerLogo} />
+              <Image source={require("./icon.png")} style={styles.headerLogo} />
               <Text style={styles.headerBrandName}>VÓRTEX PLAY</Text>
             </View>
           </View>
@@ -1128,7 +1128,7 @@ function AppScreen() {
         <SafeAreaView style={styles.profileRoot} edges={["top", "left", "right", "bottom"]}>
           <View style={styles.profileHeader}><Text style={styles.profileHeaderTitle}>Perfil e conta</Text><Pressable onPress={() => setProfileOpen(false)} style={styles.settingsClose} accessibilityLabel="Fechar perfil"><MaterialIcons name="close" size={22} color="#FFFFFF" /></Pressable></View>
           <ScrollView contentContainerStyle={styles.profileContent} showsVerticalScrollIndicator={false}>
-            <View style={styles.profileHero}><View style={styles.profileAvatar}><Image source={require("./assets/icon.png")} style={styles.profileAvatarImage} /></View><View style={styles.profileIdentity}><Text style={styles.profileKicker}>PERFIL</Text><TextInput value={profileName} onChangeText={(name) => saveProfile({ name })} style={styles.profileNameInput} placeholder="Nome do usuário" placeholderTextColor="#766F80" /><Text style={styles.profileHint}>Nome exibido neste aparelho</Text></View></View>
+            <View style={styles.profileHero}><View style={styles.profileAvatar}><Image source={require("./icon.png")} style={styles.profileAvatarImage} /></View><View style={styles.profileIdentity}><Text style={styles.profileKicker}>PERFIL</Text><TextInput value={profileName} onChangeText={(name) => saveProfile({ name })} style={styles.profileNameInput} placeholder="Nome do usuário" placeholderTextColor="#766F80" /><Text style={styles.profileHint}>Nome exibido neste aparelho</Text></View></View>
             <Pressable onPress={() => pressFeedback()} style={styles.avatarButton}><MaterialIcons name="photo-camera" size={18} color="#DCCEFF" /><Text style={styles.avatarButtonText}>Alterar avatar</Text><Text style={styles.avatarButtonHint}>Logo VÓRTEX PLAY</Text></Pressable>
             <Text style={styles.settingsSection}>GERENCIAMENTO DA ASSINATURA</Text>
             <View style={styles.accountCard}><View style={styles.accountCardIcon}><MaterialIcons name="verified-user" size={21} color="#A78BFA" /></View><View style={styles.accountCardCopy}><Text style={styles.accountCardTitle}>Fonte conectada</Text><Text style={styles.accountCardText}>Plano e renovação são administrados pelo provedor da lista.</Text></View></View>
@@ -1349,7 +1349,7 @@ function IntroSplash({ onDone }: { onDone: () => void }) {
       <View pointerEvents="none" style={styles.splashBottomShade} />
       <View style={styles.splashOverlay}>
         <View style={styles.splashHeader}>
-          <Image source={require("./assets/icon.png")} style={styles.splashHeaderLogo} />
+          <Image source={require("./icon.png")} style={styles.splashHeaderLogo} />
           <View>
             <Text style={styles.splashHeaderTitle}>VÓRTEX PLAY</Text>
             <Text style={styles.splashHeaderCaption}>ENTRETENIMENTO</Text>
@@ -1368,7 +1368,7 @@ function IntroSplash({ onDone }: { onDone: () => void }) {
         </View>
         {videoFailed ? (
           <View style={styles.splashFallback} pointerEvents="none">
-            <Image source={require("./assets/icon.png")} style={styles.splashFallbackLogo} />
+            <Image source={require("./icon.png")} style={styles.splashFallbackLogo} />
             <Text style={styles.splashFallbackText}>VÓRTEX PLAY</Text>
           </View>
         ) : null}

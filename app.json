@@ -4,10 +4,10 @@
     "slug": "vortex-play-android",
     "version": "1.7.3",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#090713"
     },
@@ -21,9 +21,9 @@
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#111317",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./android-icon-foreground.png",
+        "backgroundImage": "./android-icon-background.png",
+        "monochromeImage": "./android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false
     },
@@ -34,7 +34,7 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#090713",
-          "image": "./assets/icon.png",
+          "image": "./icon.png",
           "imageWidth": 180
         }
       ],
@@ -50,7 +50,7 @@
       ]
     ],
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./favicon.png"
     },
     "extra": {
       "eas": {
