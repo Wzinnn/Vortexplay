@@ -1,0 +1,37 @@
+{
+  "name": "vortex-play-android",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "@expo/vector-icons": "^15.1.1",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~57.0.17",
+    "expo-build-properties": "~57.0.15",
+    "expo-haptics": "^57.0.1",
+    "expo-libvlc-player": "57.0.23",
+    "expo-screen-orientation": "^57.0.1",
+    "expo-secure-store": "^57.0.1",
+    "expo-splash-screen": "57.0.8",
+    "expo-status-bar": "~57.0.1",
+    "expo-video": "^57.0.2",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "tsx": "^4.23.12",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.11"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "export:android": "expo export --platform android"
+  },
+  "private": true
+}

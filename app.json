@@ -1,0 +1,62 @@
+{
+  "expo": {
+    "name": "VÓRTEX PLAY",
+    "slug": "vortex-play-android",
+    "version": "1.7.3",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#090713"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vortexplay.android"
+    },
+    "android": {
+      "package": "com.vortexplay.android",
+      "versionCode": 13,
+      "softwareKeyboardLayoutMode": "resize",
+      "adaptiveIcon": {
+        "backgroundColor": "#111317",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-video",
+      "expo-libvlc-player",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#090713",
+          "image": "./assets/icon.png",
+          "imageWidth": 180
+        }
+      ],
+      "expo-screen-orientation",
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
+    ],
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d1d70221-1ae8-4803-808d-0644ce5464c3"
+      }
+    },
+    "owner": "wzinn444"
+  }
+}
