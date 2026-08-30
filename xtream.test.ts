@@ -73,9 +73,39 @@ describe("playbackSource", () => {
     const source = playbackSource({ id: "12", title: "Filme HLS", image: "", description: "", kind: "vod", extension: "m3u8", streamUrl: "http://stream.exemplo/movie/ana/senha/12.m3u8", credentials });
     expect(source.contentType).toBe("hls");
   });
+
+  it("usa uma fonte alternativa canônica para filme quando a fonte direta falha", () => {
+    const item = {
+      id: "22",
+      title: "Filme",
+      image: "",
+      description: "",
+      kind: "vod" as const,
+      extension: "mp4",
+      streamUrl: "http://stream.exemplo/direct/22.mp4",
+      fallbackStreamUrl: "http://stream.exemplo/movie/ana/senha/22.mp4",
+      credentials,
+    };
+    expect(playbackSource(item).uri).toBe("http://stream.exemplo/direct/22.mp4");
+    expect(playbackSource(item, true).uri).toBe("http://stream.exemplo/movie/ana/senha/22.mp4");
+  });
 });
 
 describe("playbackUrl", () => {
+  it("monta uma URL canônica de filme sem duplicar a barra do servidor", () => {
+    expect(
+      playbackUrl({
+        id: "22",
+        title: "Filme",
+        image: "",
+        description: "",
+        kind: "vod",
+        extension: ".mp4",
+        credentials: { server: "https://stream.exemplo.com///", username: "ana@email", password: "senha 123" },
+      }),
+    ).toBe("https://stream.exemplo.com/movie/ana%40email/senha%20123/22.mp4");
+  });
+
   it("monta uma URL de episódio com credenciais codificadas", () => {
     expect(
       playbackUrl({

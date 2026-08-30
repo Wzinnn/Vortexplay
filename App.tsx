@@ -92,8 +92,14 @@ async function persistLogin(account: XtreamCredentials, remember: boolean): Prom
   const serialized = serializeCredentials(account);
   // AsyncStorage is written first so it remains a reliable fallback on devices where
   // SecureStore is unavailable or temporarily fails.
-  await AsyncStorage.setItem(ACCOUNT_CACHE_KEY, serialized);
-  await safeSecureSet(STORAGE_KEY, serialized);
+  await Promise.all([
+    AsyncStorage.setItem(ACCOUNT_CACHE_KEY, serialized),
+    safeSecureSet(STORAGE_KEY, serialized),
+  ]);
+  const saved = await AsyncStorage.getItem(ACCOUNT_CACHE_KEY);
+  if (saved !== serialized) {
+    console.warn("Falha ao confirmar as credenciais no AsyncStorage");
+  }
 }
 
 async function clearPersistedLogin(): Promise<void> {
@@ -326,9 +332,13 @@ function Player({ state, onClose, onNext, onProgress, resumePosition = 0, autopl
         requestedSeekRef.current = next;
         setCurrentTime(next);
         scrubTimeRef.current = next;
-        return vlcRef.current?.seek(next * 1000, "time");
+        const request = () => vlcRef.current?.seek(next * 1000, "time") ?? Promise.resolve();
+        return request().catch(() => new Promise<void>((resolve) => setTimeout(resolve, 300)).then(request));
       })
-      .then(() => setCurrentTime(next))
+      .then(() => {
+        setCurrentTime(next);
+        scrubTimeRef.current = next;
+      })
       .catch(() => setError("Não foi possível alterar a posição deste vídeo."));
   };
 
@@ -336,6 +346,8 @@ function Player({ state, onClose, onNext, onProgress, resumePosition = 0, autopl
     if (!canScrub) return;
     scrubbingRef.current = false;
     const next = Math.max(0, Math.min(duration, scrubTimeRef.current));
+    // Atualiza a interface imediatamente; o evento nativo confirma depois.
+    setCurrentTime(next);
     scrubTimeRef.current = next;
     onProgress(item, next, duration);
     enqueueSeek(next);
@@ -408,8 +420,8 @@ function Player({ state, onClose, onNext, onProgress, resumePosition = 0, autopl
         }}
         onStopped={() => setIsPlaying(false)}
         onEncounteredError={() => {
-          if (item.kind === "series" && !useFallback && item.fallbackStreamUrl) {
-            setError("Tentando a fonte alternativa do episódio…");
+          if (item.kind !== "live" && !useFallback && item.fallbackStreamUrl) {
+            setError(item.kind === "vod" ? "Tentando a fonte alternativa do filme…" : "Tentando a fonte alternativa do episódio…");
             setUseFallback(true);
             return;
           }
@@ -905,13 +917,17 @@ function AppScreen() {
   }
 
   function disconnect() {
-    if (!rememberLogin) {
-      void clearPersistedLogin();
-      setServer("");
-      setUsername("");
-      setPassword("");
-    }
-    void Promise.all([AsyncStorage.removeItem(LAST_SYNC_KEY), AsyncStorage.removeItem(FEATURED_MOVIE_KEY)]);
+    // Logout explícito sempre encerra a sessão persistida. A restauração só
+    // deve ocorrer ao reiniciar quando o usuário ainda não saiu da conta.
+    void Promise.all([
+      clearPersistedLogin(),
+      AsyncStorage.removeItem(REMEMBER_LOGIN_KEY),
+      AsyncStorage.removeItem(LAST_SYNC_KEY),
+      AsyncStorage.removeItem(FEATURED_MOVIE_KEY),
+    ]);
+    setServer("");
+    setUsername("");
+    setPassword("");
     credentialsRef.current = null;
     setCredentials(null);
     setShowLogin(true);
@@ -1304,7 +1320,7 @@ function IntroSplash({ onDone }: { onDone: () => void }) {
   const showFallback = useCallback(() => {
     if (completedRef.current) return;
     setVideoFailed(true);
-    fallbackTimerRef.current = setTimeout(complete, 900);
+    fallbackTimerRef.current = setTimeout(complete, 400);
   }, [complete]);
 
   useEffect(() => {
@@ -1314,7 +1330,7 @@ function IntroSplash({ onDone }: { onDone: () => void }) {
     });
     fallbackTimerRef.current = setTimeout(() => {
       if (!firstFrameRef.current) showFallback();
-    }, 7000);
+    }, 2500);
 
     return () => {
       endSubscription.remove();

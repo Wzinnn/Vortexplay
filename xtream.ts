@@ -300,12 +300,13 @@ function cleanStreamUrl(value: string): string {
 }
 
 function canonicalStreamUrl(item: PlayableItem): string {
-  const base = item.credentials.server;
+  const base = item.credentials.server.replace(/\/+$/, "");
   const user = encodeURIComponent(item.credentials.username);
   const pass = encodeURIComponent(item.credentials.password);
+  const ext = normalizeExtension(item.extension) || "mp4";
   if (item.kind === "live") return `${base}/live/${user}/${pass}/${item.id}.m3u8`;
-  if (item.kind === "vod") return `${base}/movie/${user}/${pass}/${item.id}.${normalizeExtension(item.extension)}`;
-  return `${base}/series/${user}/${pass}/${item.id}.${normalizeExtension(item.extension)}`;
+  if (item.kind === "vod") return `${base}/movie/${user}/${pass}/${item.id}.${ext}`;
+  return `${base}/series/${user}/${pass}/${item.id}.${ext}`;
 }
 
 function streamUrl(item: PlayableItem, useFallback = false): string {
@@ -378,19 +379,30 @@ export async function getCatalog(
     const item = entry as Record<string, unknown>;
     const id = stringValue(kind === "series" ? item.series_id : item.stream_id) || stringValue(item.id);
     if (!id) return null;
-    return {
+    const extension = stringValue(item.container_extension) || "mp4";
+    const directSource = cleanStreamUrl(
+      stringValue(item.direct_source)
+      || stringValue(item.direct_source_url)
+      || stringValue(item.stream_url)
+      || stringValue(item.url),
+    );
+    const mappedItem = {
       id,
       title: stringValue(item.name) || "Sem título",
       image: stringValue(item.stream_icon) || stringValue(item.cover),
       description: stringValue(item.plot),
       kind,
-      extension: stringValue(item.container_extension) || "mp4",
+      extension,
       duration: Number(item.duration_secs ?? item.duration ?? 0) || undefined,
       production: stringValue(item.production_company) || stringValue(item.producer) || stringValue(item.director),
       group: stringValue(item.category_name),
       categoryId: stringValue(item.category_id),
+      streamUrl: directSource || undefined,
       credentials,
     } satisfies PlayableItem;
+    return kind !== "live" && directSource
+      ? { ...mappedItem, fallbackStreamUrl: canonicalStreamUrl(mappedItem) }
+      : mappedItem;
   });
   return mapped.filter((item): item is NonNullable<typeof item> => item !== null);
 }
