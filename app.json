@@ -2,7 +2,7 @@
   "expo": {
     "name": "VÓRTEX PLAY",
     "slug": "vortex-play-android",
-    "version": "1.7.3",
+    "version": "1.7.4",
     "orientation": "portrait",
     "icon": "./icon.png",
     "userInterfaceStyle": "dark",
@@ -17,7 +17,7 @@
     },
     "android": {
       "package": "com.vortexplay.android",
-      "versionCode": 13,
+      "versionCode": 14,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#111317",
@@ -57,6 +57,6 @@
         "projectId": "d1d70221-1ae8-4803-808d-0644ce5464c3"
       }
     },
-    "owner": "wzinn444"
+    "owner": "wzinn985s-team"
   }
 }
